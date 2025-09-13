@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>金融数学知识学习平台</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --teacher-color: #9b59b6;
+            --student-color: #f39c12;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+            --danger-color: #e74c3c;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .logo {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+        
+        .platform-desc {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .tab-container {
+            display: flex;
+            background: white;
+        }
+        
+        .tab {
+            padding: 20px;
+            flex: 1;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            font-size: 1.1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .tab.teacher-tab {
+            background: var(--teacher-color);
+            color: white;
+        }
+        
+        .tab.student-tab {
+            background: var(--student-color);
+            color: white;
+        }
+        
+        .tab.active {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1) inset;
+        }
+        
+        .tab i {
+            font-size: 1.5rem;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: var(--dark-color);
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+        
+        input:focus, textarea:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+        
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-teacher {
+            background-color: var(--teacher-color);
+        }
+        
+        .btn-student {
+            background-color: var(--student-color);
+        }
+        
+        .btn-delete {
+            background-color: var(--danger-color);
+        }
+        
+        .knowledge-item {
+            background: var(--light-color);
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border-left: 5px solid var(--primary-color);
+            position: relative;
+        }
+        
+        .knowledge-item h3 {
+            color: var(--dark-color);
+            margin-bottom: 10px;
+        }
+        
+        .knowledge-keywords {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .keyword {
+            background: var(--primary-color);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .question-input {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .question-input input {
+            flex: 1;
+        }
+        
+        .answer-container {
+            margin-top: 30px;
+            padding: 25px;
+            background: #e8f4fc;
+            border-radius: 8px;
+            display: none;
+            border-left: 5px solid var(--primary-color);
+        }
+        
+        .answer-container.show {
+            display: block;
+        }
+        
+        .knowledge-list {
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: #ddd;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 25px;
+            color: #7f8c8d;
+            background: #f8f9fa;
+            border-top: 1px solid #eee;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .tab-container {
+                flex-direction: column;
+            }
+            
+            .question-input {
+                flex-direction: column;
+            }
+            
+            header {
+                padding: 1.5rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-calculator"></i>
+            </div>
+            <h1>金融数学知识学习平台</h1>
+            <p class="platform-desc">教师输入知识，学生自主查询 - 基于GitHub Pages和浏览器技术构建</p>
+        </header>
+        
+        <div class="tab-container">
+            <div class="tab teacher-tab active" data-tab="teacher">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span>教师端</span>
+            </div>
+            <div class="tab student-tab" data-tab="student">
+                <i class="fas fa-user-graduate"></i>
+                <span>学生端</span>
+            </div>
+        </div>
+        
+        <div id="teacher-tab" class="tab-content active">
+            <h2><i class="fas fa-plus-circle"></i> 添加新知识点</h2>
+            <div class="form-group">
+                <label for="knowledge-title">知识点标题</label>
+                <input type="text" id="knowledge-title" placeholder="例如：复利计算公式">
+            </div>
+            
+            <div class="form-group">
+                <label for="knowledge-content">知识点内容</label>
+                <textarea id="knowledge-content" placeholder="请输入详细的金融数学知识..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="knowledge-keywords">关键词（用逗号分隔）</label>
+                <input type="text" id="knowledge-keywords" placeholder="例如：复利,利息,计算">
+            </div>
+            
+            <button id="save-knowledge" class="btn-teacher">
+                <i class="fas fa-save"></i> 保存知识点
+            </button>
+            
+            <h2 style="margin-top: 40px; border-bottom: 2px solid #eee; padding-bottom: 10px;">
+                <i class="fas fa-book"></i> 知识库管理
+            </h2>
+            <div id="knowledge-list" class="knowledge-list">
+                <!-- 知识点将在这里动态显示 -->
+                <div class="empty-state">
+                    <i class="fas fa-book-open"></i>
+                    <h3>暂无知识点</h3>
+                    <p>添加您的第一个金融数学知识点</p>
+                </div>
+            </div>
+        </div>
+        
+        <div id="student-tab" class="tab-content">
+            <h2><i class="fas fa-search"></i> 金融数学知识查询</h2>
+            <p>输入您的问题，系统将为您匹配相关的金融数学知识</p>
+            
+            <div class="form-group">
+                <div class="question-input">
+                    <input type="text" id="question-input" placeholder="例如：什么是复利？如何计算？">
+                    <button id="ask-question" class="btn-student">
+                        <i class="fas fa-search"></i> 查询
+                    </button>
+                </div>
+            </div>
+            
+            <div id="answer-container" class="answer-container">
+                <h3><i class="fas fa-lightbulb"></i> 解答：</h3>
+                <div id="answer-content"></div>
+            </div>
+            
+            <div id="no-answer" class="empty-state">
+                <i class="fas fa-question-circle"></i>
+                <h3>未找到相关解答</h3>
+                <p>请尝试使用不同的关键词提问或联系教师添加该知识点</p>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2023 金融数学知识学习平台 | 使用浏览器本地存储技术，数据保存在本地</p>
+            <p>可部署于GitHub Pages、Vercel、Netlify或任何静态网站托管服务</p>
+        </footer>
+    </div>
+
+    <script>
+        // 切换标签页
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                tab.classList.add('active');
+                document.getElementById(`${tab.dataset.tab}-tab`).classList.add('active');
+                
+                // 隐藏答案区域当切换标签时
+                document.getElementById('answer-container').classList.remove('show');
+                document.getElementById('no-answer').style.display = 'none';
+            });
+        });
+        
+        // 初始化知识库（如果本地存储中没有，则使用示例数据）
+        let knowledgeBase = JSON.parse(localStorage.getItem('financialMathKnowledge')) || [
+            {
+                title: "复利计算",
+                content: "复利是指利息不仅计算在本金上，还计算在之前周期的利息上。计算公式为：A = P(1 + r/n)^(nt)，其中A是未来值，P是本金，r是年利率，n是每年计息次数，t是年数。",
+                keywords: ["复利", "利息", "计算", "公式"]
+            },
+            {
+                title: "现值与未来值",
+                content: "现值是未来金额的当前价值，未来值是当前金额在未来某个时间点的价值。转换公式为：PV = FV / (1 + r)^t，其中PV是现值，FV是未来值，r是折现率，t是时间。",
+                keywords: ["现值", "未来值", "折现", "计算公式"]
+            },
+            {
+                title: "年金计算",
+                content: "年金是指一系列定期等额支付。普通年金现值公式为：P = PMT × [(1 - (1 + r)^-n) / r]，其中P是现值，PMT是每期支付金额，r是每期利率，n是总期数。",
+                keywords: ["年金", "现值", "支付", "计算公式"]
+            }
+        ];
+        
+        // 保存知识点到本地存储
+        function saveKnowledgeToStorage() {
+            localStorage.setItem('financialMathKnowledge', JSON.stringify(knowledgeBase));
+        }
+        
+        // 显示知识列表
+        function renderKnowledgeList() {
+            const knowledgeList = document.getElementById('knowledge-list');
+            
+            if (knowledgeBase.length === 0) {
+                knowledgeList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-book-open"></i>
+                        <h3>暂无知识点</h3>
+                        <p>添加您的第一个金融数学知识点</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            knowledgeList.innerHTML = '';
+            
+            knowledgeBase.forEach((knowledge, index) => {
+                const knowledgeItem = document.createElement('div');
+                knowledgeItem.className = 'knowledge-item';
+                knowledgeItem.innerHTML = `
+                    <h3>${knowledge.title}</h3>
+                    <p>${knowledge.content}</p>
+                    <div class="knowledge-keywords">
+                        ${knowledge.keywords.map(keyword => `<span class="keyword">${keyword}</span>`).join('')}
+                    </div>
+                    <button class="btn-delete" data-index="${index}">
+                        <i class="fas fa-trash"></i> 删除
+                    </button>
+                `;
+                knowledgeList.appendChild(knowledgeItem);
+            });
+            
+            // 添加删除事件监听
+            document.querySelectorAll('.btn-delete').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const index = parseInt(e.target.closest('button').dataset.index);
+                    if (confirm('确定要删除这个知识点吗？')) {
+                        knowledgeBase.splice(index, 1);
+                        saveKnowledgeToStorage();
+                        renderKnowledgeList();
+                    }
+                });
+            });
+        }
+        
+        // 保存新知识点
+        document.getElementById('save-knowledge').addEventListener('click', () => {
+            const title = document.getElementById('knowledge-title').value.trim();
+            const content = document.getElementById('knowledge-content').value.trim();
+            const keywords = document.getElementById('knowledge-keywords').value.split(',').map(k => k.trim());
+            
+            if (!title || !content) {
+                alert('请填写标题和内容！');
+                return;
+            }
+            
+            knowledgeBase.push({
+                title,
+                content,
+                keywords: keywords.filter(k => k !== '')
+            });
+            
+            saveKnowledgeToStorage();
+            renderKnowledgeList();
+            
+            // 清空表单
+            document.getElementById('knowledge-title').value = '';
+            document.getElementById('knowledge-content').value = '';
+            document.getElementById('knowledge-keywords').value = '';
+            
+            alert('知识点保存成功！');
+        });
+        
+        // 处理学生查询
+        document.getElementById('ask-question').addEventListener('click', () => {
+            const question = document.getElementById('question-input').value.trim().toLowerCase();
+            
+            if (!question) {
+                alert('请输入问题！');
+                return;
+            }
+            
+            // 在知识库中查找匹配项
+            let bestMatch = null;
+            let maxMatchCount = 0;
+            
+            knowledgeBase.forEach(knowledge => {
+                // 检查关键词匹配
+                let matchCount = 0;
+                knowledge.keywords.forEach(keyword => {
+                    if (question.includes(keyword.toLowerCase())) {
+                        matchCount++;
+                    }
+                });
+                
+                // 检查标题和内容中的匹配
+                if (question.includes(knowledge.title.toLowerCase())) {
+                    matchCount += 2; // 标题匹配给予更高权重
+                }
+                
+                if (matchCount > maxMatchCount) {
+                    maxMatchCount = matchCount;
+                    bestMatch = knowledge;
+                }
+            });
+            
+            const answerContainer = document.getElementById('answer-container');
+            const noAnswer = document.getElementById('no-answer');
+            const answerContent = document.getElementById('answer-content');
+            
+            if (bestMatch && maxMatchCount > 0) {
+                answerContent.innerHTML = `
+                    <h4>${bestMatch.title}</h4>
+                    <p>${bestMatch.content}</p>
+                    <div class="knowledge-keywords" style="margin-top: 15px;">
+                        ${bestMatch.keywords.map(keyword => `<span class="keyword">${keyword}</span>`).join('')}
+                    </div>
+                `;
+                answerContainer.classList.add('show');
+                noAnswer.style.display = 'none';
+            } else {
+                answerContainer.classList.remove('show');
+                noAnswer.style.display = 'block';
+            }
+        });
+        
+        // 初始化页面
+        renderKnowledgeList();
+        
+        // 示例问题按钮功能（仅用于演示）
+        document.addEventListener('DOMContentLoaded', function() {
+            const exampleQuestions = document.querySelectorAll('.example-question');
+            exampleQuestions.forEach(question => {
+                question.addEventListener('click', function() {
+                    document.getElementById('question-input').value = this.textContent;
+                    document.getElementById('ask-question').click();
+                });
+            });
+        });
+    </script>
+</body>
+</html>
